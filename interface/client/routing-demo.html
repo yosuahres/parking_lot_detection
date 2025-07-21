@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routing Demo - Parking Detection System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="route-config.js"></script>
+    <script src="router.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .nav-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4A90E2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .nav-button:hover {
+            background-color: #3A7BCD;
+        }
+        
+        .current-route {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .demo-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .code {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 JavaScript Routing System Demo</h1>
+    <p>This demonstrates the client-side routing system for the Parking Detection interface.</p>
+    
+    <div class="current-route">
+        <strong>Current Route:</strong> <span id="current-route-display">/demo</span>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Navigation Methods</h2>
+        <p>Test different ways to navigate:</p>
+        
+        <h3>1. Using Navigation Helper Functions</h3>
+        <button class="nav-button" onclick="navigation.goHome()">Go to Home (Dashboard)</button>
+        <button class="nav-button" onclick="navigation.goToRoiConfig()">Go to ROI Config</button>
+        <button class="nav-button" onclick="navigation.goBack()">Go Back</button>
+        
+        <h3>2. Using Data Route Attributes</h3>
+        <button class="nav-button" data-route="/">Dashboard (data-route)</button>
+        <button class="nav-button" data-route="/roi-config">ROI Config (data-route)</button>
+        
+        <h3>3. Using Router Directly</h3>
+        <button class="nav-button" onclick="router.navigate('/')">Router.navigate('/')</button>
+        <button class="nav-button" onclick="router.navigate('/roi-config')">Router.navigate('/roi-config')</button>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Route Information</h2>
+        <div id="route-info"></div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Available Routes</h2>
+        <div id="available-routes"></div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Usage Examples</h2>
+        
+        <h3>Basic Navigation</h3>
+        <div class="code">
+// Navigate to a route
+navigation.goHome();
+navigation.goToRoiConfig();
+navigation.goTo('/custom-route');
+
+// Check current route
+if (navigation.isCurrentRoute('/roi-config')) {
+    console.log('Currently on ROI config page');
+}
+        </div>
+        
+        <h3>Using Router Directly</h3>
+        <div class="code">
+// Add custom routes
+router.addRoute('/custom', {
+    title: 'Custom Page',
+    action: () => console.log('Custom page loaded'),
+    beforeEnter: () => confirm('Enter custom page?'),
+    afterEnter: () => console.log('Custom page entered')
+});
+
+// Navigate with options
+router.navigate('/custom', false); // Add to history
+router.navigate('/custom', true);  // Replace in history
+        </div>
+        
+        <h3>Route Configuration</h3>
+        <div class="code">
+// Get route information
+const route = RouteUtils.getRoute('/roi-config');
+console.log(route.title); // "ROI Configuration - Parking Detection"
+
+// Check route existence
+if (RouteUtils.routeExists('/my-route')) {
+    // Route exists
+}
+
+// Get all routes
+const allRoutes = RouteUtils.getAllRoutes();
+        </div>
+    </div>
+    
+    <script>
+        // Initialize demo
+        window.addEventListener('load', () => {
+            updateRouteInfo();
+            displayAvailableRoutes();
+            
+            // Set up route change listener for demo
+            const originalNavigate = router.navigate;
+            router.navigate = function(path, replace) {
+                originalNavigate.call(this, path, replace);
+                setTimeout(updateRouteInfo, 100);
+            };
+        });
+        
+        function updateRouteInfo() {
+            const currentPath = router.currentRoute || '/demo';
+            document.getElementById('current-route-display').textContent = currentPath;
+            
+            const routeConfig = RouteUtils.getRoute(currentPath);
+            const infoDiv = document.getElementById('route-info');
+            
+            if (routeConfig) {
+                infoDiv.innerHTML = `
+                    <strong>Route Details:</strong><br>
+                    • Name: ${routeConfig.name || 'N/A'}<br>
+                    • Title: ${routeConfig.title || 'N/A'}<br>
+                    • File: ${routeConfig.file || 'N/A'}<br>
+                    • Description: ${routeConfig.description || 'N/A'}
+                `;
+            } else {
+                infoDiv.innerHTML = '<em>No configuration found for current route</em>';
+            }
+        }
+        
+        function displayAvailableRoutes() {
+            const routes = RouteUtils.getAllRoutes();
+            const routesDiv = document.getElementById('available-routes');
+            
+            routesDiv.innerHTML = routes.map(route => `
+                <div style="border: 1px solid #eee; padding: 10px; margin: 5px 0; border-radius: 3px;">
+                    <strong>${route.path}</strong> - ${route.title}<br>
+                    <small>${route.description}</small><br>
+                    <em>File: ${route.file}</em>
+                </div>
+            `).join('');
+        }
+        
+        // Set demo as current route
+        router.currentRoute = '/demo';
+        
+        console.log('🎯 Routing Demo Loaded');
+        console.log('Available navigation methods:', {
+            'navigation.goHome()': 'Navigate to dashboard',
+            'navigation.goToRoiConfig()': 'Navigate to ROI configuration',
+            'navigation.goBack()': 'Go back in history',
+            'router.navigate(path)': 'Direct router navigation',
+            'data-route attribute': 'Automatic click handling'
+        });
+    </script>
+</body>
+</html>
