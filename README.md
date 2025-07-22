@@ -114,12 +114,6 @@ await fetch('http://localhost:8000/update-roi', {
 });
 ```
 
-## To do
-
-- [ ] **Database Integration**: PostgreSQL/MySQL support for persistent data
-- [ ] **User Authentication**: Multi-user access with role management
-- [ ] **Mobile App**: iOS/Android companion application
-
 ---
 ## 📝 Notes
 
